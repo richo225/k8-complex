@@ -1,0 +1,13 @@
+# https://kubernetes.io/docs/concepts/services-networking/service/
+apiVersion: v1
+kind: Service
+metadata:
+  name: server-cluster-ip-service
+spec:
+  selector:
+    component: server
+  type: ClusterIP
+  ports:
+  - name: server-cluster-ip-service
+    port: 5000
+    targetPort: 5000
