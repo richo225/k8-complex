@@ -1,0 +1,23 @@
+# https://kubernetes.io/docs/concepts/workloads/controllers/deployment/
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name:  postgres-deployment
+  namespace: default
+  labels:
+    app:  postgres-deployment
+spec:
+  selector:
+    matchLabels:
+      component: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        component: postgres
+    spec:
+      containers:
+        - name:  postgres
+          image:  postgres
+          ports:
+            - containerPort:  5432
