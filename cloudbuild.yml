@@ -1,3 +1,4 @@
+# Build images
 steps:
 - name: 'gcr.io/cloud-builders/docker'
   args:
@@ -29,6 +30,7 @@ steps:
   - './worker'
 
 
+# Push built images to gcp container registry
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'push'
@@ -44,3 +46,30 @@ steps:
   - 'push'
   - 'gcr.io/$PROJECT_ID/multi-worker'
 
+
+# Apply kube config files to cluster
+- name: 'gcr.io/cloud-builders/kubectl'
+  args: ['apply', './k8s']
+
+
+# Set image for deployment
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'set'
+  - 'image'
+  - 'deployments/server-deployment'
+  - 'server=multi-server'
+
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'set'
+  - 'image'
+  - 'deployments/client-deployment'
+  - 'client=multi-client'
+
+- name: 'gcr.io/cloud-builders/kubectl'
+  args:
+  - 'set'
+  - 'image'
+  - 'deployments/worker-deployment'
+  - 'worker=multi-worker'
