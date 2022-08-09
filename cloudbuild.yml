@@ -9,12 +9,7 @@ steps:
   - './client'
 
 - name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/multi-client'
-
-
-- name: 'gcr.io/cloud-builders/docker'
+  waitFor: ['-']
   args:
   - 'build'
   - '-t'
@@ -24,12 +19,7 @@ steps:
   - './server'
 
 - name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/multi-server'
-
-
-- name: 'gcr.io/cloud-builders/docker'
+  waitFor: ['-']
   args:
   - 'build'
   - '-t'
@@ -37,6 +27,17 @@ steps:
   - '-f'
   - './worker/Dockerfile'
   - './worker'
+
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/multi-client'
+
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/multi-server'
 
 - name: 'gcr.io/cloud-builders/docker'
   args:
