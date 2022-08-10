@@ -9,6 +9,23 @@ steps:
   - './client/Dockerfile'
   - './client'
 
+# Push built images to gcp container registry
+- name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/multi-client:$SHORT_SHA'
+
+  # deploy container images to GKE
+- name: "gcr.io/cloud-builders/gke-deploy"
+  args:
+  - run
+  - --filename=k8s
+  - --image=gcr.io/$PROJECT_ID/multi-client:$SHORT_SHA
+  - --location=asia-east1-a
+  - --cluster=multi-cluster
+
+
+
 - name: 'gcr.io/cloud-builders/docker'
   waitFor: ['-']
   args:
@@ -20,6 +37,21 @@ steps:
   - './server'
 
 - name: 'gcr.io/cloud-builders/docker'
+  args:
+  - 'push'
+  - 'gcr.io/$PROJECT_ID/multi-server:$SHORT_SHA'
+
+- name: "gcr.io/cloud-builders/gke-deploy"
+  args:
+  - run
+  - --filename=k8s
+  - --image=gcr.io/$PROJECT_ID/multi-server:$SHORT_SHA
+  - --location=asia-east1-a
+  - --cluster=multi-cluster
+
+
+
+- name: 'gcr.io/cloud-builders/docker'
   waitFor: ['-']
   args:
   - 'build'
@@ -29,29 +61,15 @@ steps:
   - './worker/Dockerfile'
   - './worker'
 
-
-# Push built images to gcp container registry
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/multi-client:$SHORT_SHA'
-
-- name: 'gcr.io/cloud-builders/docker'
-  args:
-  - 'push'
-  - 'gcr.io/$PROJECT_ID/multi-server:$SHORT_SHA'
-
 - name: 'gcr.io/cloud-builders/docker'
   args:
   - 'push'
   - 'gcr.io/$PROJECT_ID/multi-worker:$SHORT_SHA'
 
-
-  # deploy container images to GKE
 - name: "gcr.io/cloud-builders/gke-deploy"
   args:
   - run
   - --filename=k8s
-  - --image=gcr.io/$PROJECT_ID/multi-client:$SHORT_SHA
+  - --image=gcr.io/$PROJECT_ID/multi-worker:$SHORT_SHA
   - --location=asia-east1-a
   - --cluster=multi-cluster
